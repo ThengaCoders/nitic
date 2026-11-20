@@ -1,0 +1,269 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ENUMS
+
+enum FestStatus {
+  DRAFT
+  PUBLISHED
+  COMPLETED
+  CANCELLED
+}
+
+enum EventStatus {
+  DRAFT
+  OPEN
+  CLOSED
+  COMPLETED
+  CANCELLED
+}
+
+enum FestMemberRole {
+  EDITOR
+}
+
+enum RegistrationStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+  REJECTED
+}
+
+enum RegistrationFieldType {
+  TEXT
+  NUMBER
+  EMAIL
+  PHONE
+  URL
+  DATE
+  BOOLEAN
+  SELECT
+  MULTI_SELECT
+}
+
+enum PaymentStatus {
+  CREATED
+  PENDING
+  SUCCESS
+  FAILED
+  REFUNDED
+}
+
+// PLATFORM USERS
+
+model User {
+  id            String   @id @default(uuid()) @db.Uuid
+  name          String
+  email         String   @unique
+  passwordHash  String?
+
+  authAccounts  AuthAccount[]
+  ownedFests    Fest[]       @relation("FestOwner")
+  editedFests   FestMember[]
+  createdEvents Event[]      @relation("EventCreator")
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+}
+
+model AuthAccount {
+  id                String   @id @default(uuid()) @db.Uuid
+  userId            String   @db.Uuid
+  provider          String
+  providerAccountId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+// FESTS
+
+model Fest {
+  id          String     @id @default(uuid()) @db.Uuid
+  ownerId     String     @db.Uuid
+  name        String
+  description String?
+  logoUrl     String?
+  startDate   DateTime?  @db.Timestamptz(3)
+  endDate     DateTime?  @db.Timestamptz(3)
+  status      FestStatus @default(DRAFT)
+
+  owner   User        @relation("FestOwner", fields: [ownerId], references: [id])
+  members FestMember[]
+  events  Event[]
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([ownerId])
+}
+
+model FestMember {
+  id     String         @id @default(uuid()) @db.Uuid
+  festId String         @db.Uuid
+  userId String         @db.Uuid
+  role   FestMemberRole @default(EDITOR)
+
+  fest Fest @relation(fields: [festId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  addedAt DateTime @default(now()) @db.Timestamptz(3)
+
+  @@unique([festId, userId])
+  @@index([userId])
+}
+
+// EVENTS
+
+model Event {
+  id          String    @id @default(uuid()) @db.Uuid
+  festId      String?   @db.Uuid
+  createdById String    @db.Uuid
+  name        String
+  description String?
+  venue       String?
+  startTime   DateTime? @db.Timestamptz(3)
+  endTime     DateTime? @db.Timestamptz(3)
+
+  registrationStartAt DateTime? @db.Timestamptz(3)
+  registrationEndAt   DateTime? @db.Timestamptz(3)
+
+  capacity        Int?
+  registrationFee Decimal   @default(0) @db.Decimal(10, 2)
+  status          EventStatus @default(DRAFT)
+
+  fest      Fest? @relation(fields: [festId], references: [id], onDelete: Restrict)
+  createdBy User  @relation("EventCreator", fields: [createdById], references: [id])
+
+  registrationFields RegistrationField[]
+  registrations      Registration[]
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([festId])
+  @@index([createdById])
+  @@index([status])
+}
+
+// CUSTOM REGISTRATION FORM FIELDS
+
+model RegistrationField {
+  id           String               @id @default(uuid()) @db.Uuid
+  eventId      String               @db.Uuid
+  name         String
+  key          String
+  type         RegistrationFieldType
+  isRequired   Boolean              @default(false)
+  options      Json?
+  displayOrder Int                  @default(0)
+
+  event  Event                    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  values RegistrationFieldValue[]
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  @@unique([eventId, key])
+  @@index([eventId])
+}
+
+// PARTICIPANTS
+
+model Participant {
+  id String @id @default(uuid()) @db.Uuid
+
+  name  String
+  email String
+
+  registrations Registration[]
+
+  createdAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime @updatedAt @db.Timestamptz(3)
+
+  @@index([email])
+}
+
+// EVENT REGISTRATIONS
+
+model Registration {
+  id            String             @id @default(uuid()) @db.Uuid
+  participantId String             @db.Uuid
+  eventId       String             @db.Uuid
+  status        RegistrationStatus @default(PENDING)
+
+  participant Participant @relation(fields: [participantId], references: [id])
+  event       Event       @relation(fields: [eventId], references: [id])
+
+  fieldValues RegistrationFieldValue[]
+  ticket      Ticket?
+  payments    Payment[]
+
+  registeredAt DateTime @default(now()) @db.Timestamptz(3)
+  updatedAt    DateTime @updatedAt @db.Timestamptz(3)
+
+  @@unique([participantId, eventId])
+  @@index([eventId, status])
+  @@index([participantId])
+}
+
+// CUSTOM FORM ANSWERS
+
+model RegistrationFieldValue {
+  id             String @id @default(uuid()) @db.Uuid
+  registrationId String @db.Uuid
+  fieldId        String @db.Uuid
+  value          Json
+
+  registration Registration      @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+  field        RegistrationField @relation(fields: [fieldId], references: [id], onDelete: Cascade)
+
+  @@unique([registrationId, fieldId])
+  @@index([fieldId])
+}
+
+// TICKETS
+
+model Ticket {
+  id             String   @id @default(uuid()) @db.Uuid
+  registrationId String   @unique @db.Uuid
+  qrToken        String   @unique
+
+  registration Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  issuedAt    DateTime  @default(now()) @db.Timestamptz(3)
+  checkedInAt DateTime? @db.Timestamptz(3)
+}
+
+// PAYMENTS
+
+model Payment {
+  id                String        @id @default(uuid()) @db.Uuid
+  registrationId    String        @db.Uuid
+  amount            Decimal       @db.Decimal(10, 2)
+  provider          String
+  providerOrderId   String?
+  providerPaymentId String?
+  status            PaymentStatus @default(CREATED)
+
+  registration Registration @relation(fields: [registrationId], references: [id], onDelete: Cascade)
+
+  paidAt    DateTime? @db.Timestamptz(3)
+  createdAt DateTime  @default(now()) @db.Timestamptz(3)
+  updatedAt DateTime  @updatedAt @db.Timestamptz(3)
+
+  @@unique([provider, providerOrderId])
+  @@unique([provider, providerPaymentId])
+  @@index([registrationId])
+  @@index([status])
+}
