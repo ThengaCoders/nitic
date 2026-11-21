@@ -1,122 +1,103 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import React, { useState, useEffect } from 'react';
+import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import Navbar from './components/Navbar';
+import Hero from './components/Hero';
+import TrustStrip from './components/TrustStrip';
+import Features from './components/Features';
+import HowItWorks from './components/HowItWorks';
+import ProductShowcase from './components/ProductShowcase';
+import Benefits from './components/Benefits';
+import FinalCTA from './components/FinalCTA';
+import Footer from './components/Footer';
+import AuthModal from './components/AuthModal';
 
-function App() {
-  const [count, setCount] = useState(0)
+function HomePageContent() {
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
+  const [authSlug, setAuthSlug] = useState('');
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  // Handle URL route changes for /login and /register or /get-started
+  useEffect(() => {
+    if (location.pathname === '/login') {
+      setAuthMode('login');
+      setAuthModalOpen(true);
+    } else if (location.pathname === '/get-started' || location.pathname === '/signup') {
+      setAuthMode('register');
+      setAuthModalOpen(true);
+    }
+  }, [location.pathname]);
+
+  const handleOpenAuth = (mode = 'login', slug = '') => {
+    setAuthMode(mode);
+    setAuthSlug(slug);
+    setAuthModalOpen(true);
+    if (mode === 'login') {
+      navigate('/login', { replace: true });
+    } else {
+      navigate('/get-started', { replace: true });
+    }
+  };
+
+  const handleCloseAuth = () => {
+    setAuthModalOpen(false);
+    navigate('/', { replace: true });
+  };
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="min-h-screen bg-[#F8FAFC] text-[#111827] flex flex-col font-sans selection:bg-[#2563EB] selection:text-white">
+      {/* Responsive Navigation Bar */}
+      <Navbar onOpenAuth={handleOpenAuth} />
 
-      <div className="ticks"></div>
+      {/* Main Content Area */}
+      <main className="flex-1">
+        {/* 1. Hero Section */}
+        <Hero onOpenAuth={handleOpenAuth} />
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
+        {/* 2. Social Proof / Category Strip */}
+        <TrustStrip />
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        {/* 3. Core Features (Bento Grid) */}
+        <Features onOpenAuth={handleOpenAuth} />
+
+        {/* 4. How It Works (3 Steps) */}
+        <HowItWorks onOpenAuth={handleOpenAuth} />
+
+        {/* 5. Deep-dive Product Showcase */}
+        <ProductShowcase onOpenAuth={handleOpenAuth} />
+
+        {/* 6. Benefits for Organizing Teams */}
+        <Benefits onOpenAuth={handleOpenAuth} />
+
+        {/* 7. Final High-Impact CTA */}
+        <FinalCTA onOpenAuth={handleOpenAuth} />
+      </main>
+
+      {/* 8. Detailed Footer */}
+      <Footer onOpenAuth={handleOpenAuth} />
+
+      {/* Interactive Auth / Onboarding Modal (Handles /login & /get-started placeholders) */}
+      <AuthModal
+        isOpen={authModalOpen}
+        onClose={handleCloseAuth}
+        initialMode={authMode}
+        initialSlug={authSlug}
+      />
+    </div>
+  );
 }
 
-export default App
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<HomePageContent />} />
+        <Route path="/login" element={<HomePageContent />} />
+        <Route path="/get-started" element={<HomePageContent />} />
+        <Route path="/signup" element={<HomePageContent />} />
+        <Route path="*" element={<HomePageContent />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
