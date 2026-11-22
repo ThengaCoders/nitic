@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Menu, X, ArrowRight } from 'lucide-react';
+import niticLogo from '../assets/nitic.svg';
 
 export default function Navbar({ onOpenAuth }) {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -53,25 +54,11 @@ export default function Navbar({ onOpenAuth }) {
             className="flex items-center gap-2.5 group focus:outline-none"
             aria-label="NITIC Home"
           >
-            {/* Geometric Ticket Mark */}
-            <div className="relative w-9 h-9 rounded-xl bg-[#2563EB] flex items-center justify-center text-white shadow-md shadow-blue-500/20 group-hover:scale-105 transition-transform duration-200">
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M4 8.5C5.38071 8.5 6.5 7.38071 6.5 6V4H17.5V6C17.5 7.38071 18.6193 8.5 20 8.5V15.5C18.6193 15.5 17.5 16.6193 17.5 18V20H6.5V18C6.5 16.6193 5.38071 15.5 4 15.5V8.5Z"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M10 9L14 15M14 9L10 15"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-blue-300 animate-pulse" />
-            </div>
+            <img 
+              src={niticLogo} 
+              alt="NITIC Logo" 
+              className="w-8 h-8 object-contain group-hover:scale-105 transition-transform duration-200" 
+            />
 
             <div className="flex flex-col">
               <div className="flex items-center gap-1.5">

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, Check, ArrowRight, ShieldCheck, Mail, Lock, Building2, User } from 'lucide-react';
+import niticLogo from '../assets/nitic.svg';
 
 export default function AuthModal({ isOpen, onClose, initialMode = 'login', initialSlug = '' }) {
   const [mode, setMode] = useState(initialMode);
@@ -118,6 +119,10 @@ export default function AuthModal({ isOpen, onClose, initialMode = 'login', init
             </div>
 
             <div className="mb-5">
+              <div className="flex items-center gap-2 mb-2">
+                <img src={niticLogo} alt="NITIC Logo" className="w-6 h-6 object-contain" />
+                <span className="font-extrabold text-sm tracking-tight text-[#111827]">NITIC</span>
+              </div>
               <h3 className="text-xl font-bold text-[#111827]">
                 {mode === 'login' ? 'Access your NITIC Workspace' : 'Set up your fest on NITIC'}
               </h3>

@@ -1,5 +1,6 @@
 import React from 'react';
 import { ArrowUpRight } from 'lucide-react';
+import niticLogo from '../assets/nitic.svg';
 
 export default function Footer({ onOpenAuth }) {
   const scrollToSection = (e, sectionId) => {
@@ -33,18 +34,7 @@ export default function Footer({ onOpenAuth }) {
               }}
               className="flex items-center gap-2.5 focus:outline-none inline-flex"
             >
-              <div className="w-8 h-8 rounded-xl bg-[#2563EB] flex items-center justify-center text-white shadow-sm">
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M4 8.5C5.38071 8.5 6.5 7.38071 6.5 6V4H17.5V6C17.5 7.38071 18.6193 8.5 20 8.5V15.5C18.6193 15.5 17.5 16.6193 17.5 18V20H6.5V18C6.5 16.6193 5.38071 15.5 4 15.5V8.5Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path d="M10 9L14 15M14 9L10 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-                </svg>
-              </div>
+              <img src={niticLogo} alt="NITIC Logo" className="w-8 h-8 object-contain" />
               <span className="font-extrabold text-xl tracking-tight text-[#111827]">
                 NITIC
               </span>
