@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fest Website - Event Registration Demo</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f8fafc;
+      margin: 0;
+      padding: 40px 20px;
+    }
+    .page-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .hero {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .hero h1 {
+      color: #0f172a;
+      margin-bottom: 8px;
+    }
+    .hero p {
+      color: #64748b;
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="hero">
+      <h1>TechFest 2026 Registration</h1>
+      <p>Host Website Example demonstrating the isolated embeddable widget</p>
+    </div>
+
+    <!-- 1. The target container for the widget -->
+    <div id="event-registration"></div>
+
+    <!-- 2. The embed script tag with data attributes -->
+    <script 
+      src="/widget/widget.js" 
+      data-event-id="evt_techfest_2026" 
+      data-target="event-registration"
+      data-api-base="/api/public">
+    </script>
+  </div>
+</body>
+</html>
