@@ -33,6 +33,7 @@ enum RegistrationStatus {
   CONFIRMED
   CANCELLED
   REJECTED
+  EXPIRED
 }
 
 enum RegistrationFieldType {
@@ -139,6 +140,7 @@ model Event {
   registrationEndAt   DateTime? @db.Timestamptz(3)
 
   capacity        Int?
+  holdMinutes Int @default(15)
   registrationFee Decimal   @default(0) @db.Decimal(10, 2)
   status          EventStatus @default(DRAFT)
 
@@ -210,10 +212,12 @@ model Registration {
   payments    Payment[]
 
   registeredAt DateTime @default(now()) @db.Timestamptz(3)
+  expiresAt      DateTime? @db.Timestamptz(3)
+  extensionCount Int       @default(0)
   updatedAt    DateTime @updatedAt @db.Timestamptz(3)
 
   @@unique([participantId, eventId])
-  @@index([eventId, status])
+  @@index([eventId, status, expiresAt])
   @@index([participantId])
 }
 
